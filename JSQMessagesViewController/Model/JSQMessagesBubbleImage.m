@@ -56,4 +56,21 @@
                                                         highlightedImage:[UIImage imageWithCGImage:self.messageBubbleHighlightedImage.CGImage]];
 }
 
+#pragma mark - NSCoding
+- (void)encodeWithCoder:(NSCoder *)aCoder
+{
+    [aCoder encodeObject:_messageBubbleImage forKey:@"messageBubbleImage"];
+    
+    [aCoder encodeObject:_messageBubbleHighlightedImage forKey:@"messageBubbleHighlightedImage"];
+}
+- (instancetype)initWithCoder:(NSCoder *)coder
+{
+    self = [super init];
+    if (self) {
+        _messageBubbleImage = [coder decodeObjectForKey:@"messageBubbleImage"];
+        
+        _messageBubbleHighlightedImage = [coder  decodeObjectForKey:@"messageBubbleHighlightedImage"];
+    }
+    return self;
+}
 @end

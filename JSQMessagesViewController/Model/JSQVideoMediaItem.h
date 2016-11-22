@@ -27,6 +27,11 @@
 @interface JSQVideoMediaItem : JSQMediaItem <JSQMessageMediaData, NSCoding, NSCopying>
 
 /**
+ *  The external URL that identifies a video resource.
+ */
+@property (nonatomic, strong) NSURL *externalFileURL;
+
+/**
  *  The URL that identifies a video resource.
  */
 @property (nonatomic, strong) NSURL *fileURL;
@@ -52,5 +57,7 @@
  *  set the fileURL property or isReadyToPlay property, respectively.
  */
 - (instancetype)initWithFileURL:(NSURL *)fileURL isReadyToPlay:(BOOL)isReadyToPlay;
+
+- (instancetype)initWithFileURL:(NSURL *)fileURL withSavedDir:(NSString*)dir isReadyToPlay:(BOOL)isReadyToPlay;
 
 @end

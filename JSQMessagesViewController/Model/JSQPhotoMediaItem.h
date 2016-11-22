@@ -44,4 +44,10 @@
  */
 - (instancetype)initWithImage:(UIImage *)image;
 
+- (instancetype)initWithImage:(UIImage *)image withSavedDir:(NSString*)dir;
+
+- (void)setImage:(UIImage *)image witDir:(NSString*)dir;
+
+-(void) deleteStorageMedia;
+
 @end

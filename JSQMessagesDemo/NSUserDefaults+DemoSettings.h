@@ -38,4 +38,7 @@
 + (void)saveIncomingAvatarSetting:(BOOL)value;
 + (BOOL)incomingAvatarSetting;
 
++ (void)saveOnStorageSetting:(BOOL)value;
++ (BOOL)storageSetting;
+
 @end

@@ -40,6 +40,12 @@
  */
 @property (assign, nonatomic) BOOL appliesMediaViewMaskAsOutgoing;
 
+@property (copy, nonatomic) NSString * mediaPath;
+
+@property (copy, nonatomic) NSString * parentDir;
+
+- (instancetype)initWithMediaDir:(NSString*)dir;
+
 /**
  *  Initializes and returns a media item with the specified value for maskAsOutgoing.
  *
@@ -54,5 +60,9 @@
  *  Clears any media view or media placeholder view that the item has cached.
  */
 - (void)clearCachedMediaViews;
+/**
+ *  Delete all the saved media that was stored like photes/videos etc.
+ */
+-(void) deleteStorageMedia;
 
 @end

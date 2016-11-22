@@ -132,7 +132,7 @@
     
     [self addPhotoMediaMessage];
     [self addAudioMediaMessage];
-    
+    [self addContactMediaMessage];
     /**
      *  Setting to load extra messages for testing/demo
      */
@@ -170,13 +170,12 @@
 
 - (void)addPhotoMediaMessage
 {
-    JSQPhotoMediaItem *photoItem = [[JSQPhotoMediaItem alloc] initWithImage:[UIImage imageNamed:@"goldengate"]];
+    JSQPhotoMediaItem *photoItem = [[JSQPhotoMediaItem alloc] initWithImage:[UIImage imageNamed:@"goldengate"] withSavedDir:nil];
     JSQMessage *photoMessage = [JSQMessage messageWithSenderId:kJSQDemoAvatarIdSquires
                                                    displayName:kJSQDemoAvatarDisplayNameSquires
                                                          media:photoItem];
     [self.messages addObject:photoMessage];
 }
-
 - (void)addLocationMediaMessageCompletion:(JSQLocationMediaItemCompletionBlock)completion
 {
     CLLocation *ferryBuildingInSF = [[CLLocation alloc] initWithLatitude:37.795313 longitude:-122.393757];
@@ -213,11 +212,39 @@
     
     contact.phoneNumbers = @[homePhone];
     
-    JSQContactItem *contactItem = [[JSQContactItem alloc] initWithContact:contact];
+    JSQContactMediaItem *contactItem = [[JSQContactMediaItem alloc] initWithContact:contact];
     JSQMessage *contactMessage = [JSQMessage messageWithSenderId:kJSQDemoAvatarIdSquires
                                                      displayName:kJSQDemoAvatarDisplayNameSquires
                                                            media:contactItem];
     [self.messages addObject:contactMessage];
 }
 
+#pragma mark - NSCoding
+- (void)encodeWithCoder:(NSCoder *)aCoder
+{
+    [aCoder encodeObject:self.messages forKey:NSStringFromSelector(@selector(messages))];
+    [aCoder encodeObject:self.avatars forKey:@"avatars"];
+    [aCoder encodeObject:self.outgoingBubbleImageData forKey:NSStringFromSelector(@selector(outgoingBubbleImageData))];
+    [aCoder encodeObject:self.incomingBubbleImageData forKey:NSStringFromSelector(@selector(incomingBubbleImageData))];
+    [aCoder encodeObject:self.users forKey:NSStringFromSelector(@selector(users))];
+    
+    
+}
+- (instancetype)initWithCoder:(NSCoder *)coder
+{
+    self = [super init];
+    if (self) {
+        
+        self.messages = [coder decodeObjectForKey:@"messages"];
+        
+        self.avatars = [coder decodeObjectForKey:@"avatars"];
+        
+        self.outgoingBubbleImageData = [coder decodeObjectForKey:NSStringFromSelector(@selector(outgoingBubbleImageData))];
+        
+        self.incomingBubbleImageData = [coder decodeObjectForKey:NSStringFromSelector(@selector(incomingBubbleImageData))];
+        
+        self.users = [coder decodeObjectForKey:NSStringFromSelector(@selector(users))];
+    }
+    return self;
+}
 @end

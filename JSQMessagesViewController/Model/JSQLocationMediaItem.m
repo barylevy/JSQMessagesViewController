@@ -1,4 +1,4 @@
-//
+ //
 //  Created by Jesse Squires
 //  http://www.jessesquires.com
 //
@@ -20,13 +20,15 @@
 
 #import "JSQMessagesMediaPlaceholderView.h"
 #import "JSQMessagesMediaViewBubbleImageMasker.h"
+#import "JSQMessagesLocationView.h"
+#import "UIColor+JSQMessages.h"
 
 
 @interface JSQLocationMediaItem ()
 
 @property (strong, nonatomic) UIImage *cachedMapSnapshotImage;
 
-@property (strong, nonatomic) UIImageView *cachedMapImageView;
+@property (strong, nonatomic) JSQMessagesLocationView *cachedLocationMediaView;
 
 @end
 
@@ -47,7 +49,9 @@
 - (void)clearCachedMediaViews
 {
     [super clearCachedMediaViews];
-    _cachedMapImageView = nil;
+    _cachedLocationMediaView = nil;
+    _cachedMapSnapshotImage = nil;
+
 }
 
 #pragma mark - Setters
@@ -60,8 +64,8 @@
 - (void)setAppliesMediaViewMaskAsOutgoing:(BOOL)appliesMediaViewMaskAsOutgoing
 {
     [super setAppliesMediaViewMaskAsOutgoing:appliesMediaViewMaskAsOutgoing];
-    _cachedMapSnapshotImage = nil;
-    _cachedMapImageView = nil;
+    
+    _cachedLocationMediaView = nil;
 }
 
 #pragma mark - Map snapshot
@@ -74,8 +78,8 @@
 - (void)setLocation:(CLLocation *)location region:(MKCoordinateRegion)region withCompletionHandler:(JSQLocationMediaItemCompletionBlock)completion
 {
     _location = [location copy];
-    _cachedMapSnapshotImage = nil;
-    _cachedMapImageView = nil;
+    
+    _cachedLocationMediaView = nil;
     
     if (_location == nil) {
         return;
@@ -121,36 +125,105 @@
                   }
                   UIGraphicsEndImageContext();
                   
-                  if (completion) {
-                      dispatch_async(dispatch_get_main_queue(), completion);
-                  }
+                  
+                    dispatch_async(dispatch_get_main_queue(), ^(){
+                          self.cachedLocationMediaView.mapImage.image = self.cachedMapSnapshotImage;
+                          if (completion) {
+                              completion();
+                          }
+                      });
+                  
               }];
 }
-
+- (void)createGoogleMapViewSnapshotForLocation:(CLLocation *)location
+                        coordinateRegion:(MKCoordinateRegion)region
+                   withCompletionHandler:(JSQLocationMediaItemCompletionBlock)completion
+{
+    CGFloat yourLatitude = location.coordinate.latitude;
+    CGFloat yourLongitude = location.coordinate.longitude;
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        
+        CGSize size = [self mediaViewDisplaySize];
+        NSString *staticMapUrl = [NSString stringWithFormat:@"http://maps.google.com/maps/api/staticmap?markers=color:red|%f,%f&sensor=true&zoom=%d&size=280x250",yourLatitude, yourLongitude,17];
+        
+        
+        NSURL *mapUrl = [NSURL URLWithString:[staticMapUrl stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+        UIImage *image = [UIImage imageWithData: [NSData dataWithContentsOfURL:mapUrl]];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            self.cachedLocationMediaView.mapImage.image = image;
+            
+            if (completion!=nil) {
+                completion();
+            }
+        });
+    });
+    
+}
 #pragma mark - MKAnnotation
 
 - (CLLocationCoordinate2D)coordinate
 {
     return self.location.coordinate;
 }
-
+- (CGSize)mediaViewDisplaySize
+{
+    if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+        return CGSizeMake(315.0f, 225.0f);
+    }
+    
+    return CGSizeMake(280.0f, 256.0f);
+}
 #pragma mark - JSQMessageMediaData protocol
 
 - (UIView *)mediaView
 {
-    if (self.location == nil || self.cachedMapSnapshotImage == nil) {
+    if (self.location == nil ) {
         return nil;
     }
     
-    if (self.cachedMapImageView == nil) {
-        UIImageView *imageView = [[UIImageView alloc] initWithImage:self.cachedMapSnapshotImage];
+    if (self.cachedLocationMediaView == nil) {
+        
+        CGSize size = [self mediaViewDisplaySize];
+        
+        JSQMessagesLocationView *locationView = [[[NSBundle bundleForClass:[JSQMessagesLocationView class]] loadNibNamed:@"JSQMessagesLocationView" owner:self options:nil] objectAtIndex:0];
+        
+        locationView.backgroundColor = [UIColor jsq_messageBubbleLightGrayColor];
+        UIImageView *imageView = locationView.mapImage;
+        imageView.layer.cornerRadius = 16.0f;
         imageView.contentMode = UIViewContentModeScaleAspectFill;
         imageView.clipsToBounds = YES;
-        [JSQMessagesMediaViewBubbleImageMasker applyBubbleImageMaskToMediaView:imageView isOutgoing:self.appliesMediaViewMaskAsOutgoing];
-        self.cachedMapImageView = imageView;
+        
+        imageView.image = self.cachedMapSnapshotImage;
+        
+        
+        NSString* locationName = [self.locationDetails objectForKey:JSQLocationMediaItem_LOCATION_NAME];
+        NSString* locationAddress = [self.locationDetails objectForKey:JSQLocationMediaItem_LOCATION_DESCRIPTION];
+        NSString* locationDetails = nil;
+        
+        
+        if ( locationName != nil)
+        {
+            locationDetails = locationName;
+            
+            if( locationDetails != nil  )
+            {
+                [locationDetails stringByAppendingString:@"\n"];
+            }
+        }
+        if(locationAddress!=nil)
+            [locationDetails stringByAppendingString:locationAddress];
+        
+        locationView.locDesc.text = locationDetails;
+        [JSQMessagesMediaViewBubbleImageMasker applyBubbleImageMaskToMediaView:locationView isOutgoing:self.appliesMediaViewMaskAsOutgoing];
+        
+        self.cachedLocationMediaView = locationView;
     }
     
-    return self.cachedMapImageView;
+    return self.cachedLocationMediaView;
+    
 }
 
 - (NSUInteger)mediaHash
@@ -188,8 +261,14 @@
 {
     self = [super initWithCoder:aDecoder];
     if (self) {
-        CLLocation *location = [aDecoder decodeObjectForKey:NSStringFromSelector(@selector(location))];
-        [self setLocation:location withCompletionHandler:nil];
+        self.location = [aDecoder decodeObjectForKey:NSStringFromSelector(@selector(location))];
+        self.cachedLocationMediaView = [aDecoder decodeObjectForKey:NSStringFromSelector(@selector(cachedLocationMediaView))];
+        self.locationDetails = [aDecoder decodeObjectForKey:NSStringFromSelector(@selector(locationDetails))];
+        
+        [JSQMessagesMediaViewBubbleImageMasker applyBubbleImageMaskToMediaView:self.cachedLocationMediaView isOutgoing:self.appliesMediaViewMaskAsOutgoing];
+        
+        self.cachedLocationMediaView.mapImage.layer.cornerRadius = 6.0f;
+        
     }
     return self;
 }
@@ -198,6 +277,8 @@
 {
     [super encodeWithCoder:aCoder];
     [aCoder encodeObject:self.location forKey:NSStringFromSelector(@selector(location))];
+    [aCoder encodeObject:self.cachedLocationMediaView forKey:NSStringFromSelector(@selector(cachedLocationMediaView))];
+    [aCoder encodeObject:self.locationDetails forKey:NSStringFromSelector(@selector(locationDetails))];
 }
 
 #pragma mark - NSCopying

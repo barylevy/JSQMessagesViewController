@@ -24,7 +24,7 @@ static NSString * const kSettingEmptyMessages = @"kSettingEmptyMessages";
 static NSString * const kSettingSpringiness = @"kSettingSpringiness";
 static NSString * const kSettingIncomingAvatar = @"kSettingIncomingAvatar";
 static NSString * const kSettingOutgoingAvatar = @"kSettingOutgoingAvatar";
-
+static NSString * const kSettingSaveStorage = @"kSettingSaveStorage";
 
 @implementation NSUserDefaults (DemoSettings)
 
@@ -86,6 +86,15 @@ static NSString * const kSettingOutgoingAvatar = @"kSettingOutgoingAvatar";
 + (BOOL)incomingAvatarSetting
 {
     return [[NSUserDefaults standardUserDefaults] boolForKey:kSettingIncomingAvatar];
+}
++ (void)saveOnStorageSetting:(BOOL)value
+{
+    [[NSUserDefaults standardUserDefaults] setBool:value forKey:kSettingSaveStorage];
+}
+
++ (BOOL)storageSetting
+{
+    return [[NSUserDefaults standardUserDefaults] boolForKey:kSettingSaveStorage];
 }
 
 @end

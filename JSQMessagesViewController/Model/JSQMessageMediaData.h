@@ -78,4 +78,9 @@
  */
 - (NSUInteger)mediaHash;
 
+/**
+ *  Delete all the saved media that was stored like photes/videos etc.
+ */
+- (void) deleteStorageMedia;
+
 @end

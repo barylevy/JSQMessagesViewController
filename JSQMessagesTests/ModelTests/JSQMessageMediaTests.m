@@ -34,6 +34,7 @@
 
 - (NSUInteger)mediaHash { return self.hash; }
 
+- (void) deleteStorageMedia{}
 @end
 
 

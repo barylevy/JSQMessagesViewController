@@ -1,5 +1,6 @@
-//  Created by Bary Levy
-//  http://www.jessesquires.com
+//
+//  Created by Bary Levy (2016).
+//  barylevy@gmail.com
 //
 //
 //  Documentation
@@ -11,12 +12,12 @@
 //
 //
 //  License
-//  Copyright (c) 2016 Bary Levy
+//  Copyright (c) 2016 Jesse Squires
 //  Released under an MIT license: http://opensource.org/licenses/MIT
 //
 
 
-#import "JSQContactItem.h"
+#import "JSQContactMediaItem.h"
 
 #import "JSQMessagesMediaPlaceholderView.h"
 #import "JSQMessagesMediaViewBubbleImageMasker.h"
@@ -24,14 +25,14 @@
 #import <Contacts/CNContactFormatter.h>
 #import "UIColor+JSQMessages.h"
 
-@interface JSQContactItem ()
+@interface JSQContactMediaItem ()
 
 @property (strong, nonatomic) UIView *cachedContactView;
 
 @end
 
 
-@implementation JSQContactItem
+@implementation JSQContactMediaItem
 
 #pragma mark - Initialization
 
@@ -196,13 +197,9 @@
 
 - (instancetype)copyWithZone:(NSZone *)zone
 {
-    JSQContactItem *copy = [[JSQContactItem allocWithZone:zone] initWithContact:self.contact];
+    JSQContactMediaItem *copy = [[JSQContactMediaItem allocWithZone:zone] initWithContact:self.contact];
     copy.appliesMediaViewMaskAsOutgoing = self.appliesMediaViewMaskAsOutgoing;
     return copy;
-}
--(void) deleteMedia
-{
-    
 }
 
 @end

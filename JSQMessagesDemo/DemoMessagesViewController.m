@@ -17,9 +17,9 @@
 //
 
 #import "DemoMessagesViewController.h"
-#import "JSQContactItem.h"
 #import <MediaPlayer/MediaPlayer.h>
 #import <ContactsUI/ContactsUI.h>
+#import "DemoMessagesViewController+Storage.h"
 
 @interface DemoMessagesViewController () 
 
@@ -56,6 +56,10 @@
      *  Load up our fake data for the demo
      */
     self.demoData = [[DemoModelData alloc] init];
+    
+    if ([NSUserDefaults storageSetting]) {
+        [self loadData];
+    }
     
     
     /**
@@ -99,6 +103,7 @@
      *
      *  self.inputToolbar.maximumHeight = 150;
      */
+    
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -124,7 +129,15 @@
     self.collectionView.collectionViewLayout.springinessEnabled = [NSUserDefaults springinessSetting];
 }
 
-
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    
+    if ([NSUserDefaults storageSetting]) {
+        [self storeData];
+    }
+    
+}
 
 #pragma mark - Custom menu actions for cells
 
@@ -251,8 +264,8 @@
                 
                 newMediaData = audioItemCopy;
             }
-            else if ([copyMediaData isKindOfClass:[JSQContactItem class]]) {
-                JSQContactItem *contactItemCopy = [((JSQContactItem *)copyMediaData) copy];
+            else if ([copyMediaData isKindOfClass:[JSQContactMediaItem class]]) {
+                JSQContactMediaItem *contactItemCopy = [((JSQContactMediaItem *)copyMediaData) copy];
                 contactItemCopy.appliesMediaViewMaskAsOutgoing = NO;
                 newMediaAttachmentCopy = [contactItemCopy.contact copy];
                 
@@ -305,7 +318,9 @@
                 }
                 else if ([newMediaData isKindOfClass:[JSQLocationMediaItem class]]) {
                     [((JSQLocationMediaItem *)newMediaData)setLocation:newMediaAttachmentCopy withCompletionHandler:^{
+//                        [((JSQLocationMediaItem *)newMediaData) clearCachedMediaViews];
                         [self.collectionView reloadData];
+                    
                     }];
                 }
                 else if ([newMediaData isKindOfClass:[JSQVideoMediaItem class]]) {
@@ -315,6 +330,10 @@
                 }
                 else if ([newMediaData isKindOfClass:[JSQAudioMediaItem class]]) {
                     ((JSQAudioMediaItem *)newMediaData).audioData = newMediaAttachmentCopy;
+                    [self.collectionView reloadData];
+                }
+                else if ([newMediaData isKindOfClass:[JSQContactMediaItem class]]) {
+                    ((JSQContactMediaItem *)newMediaData).contact = newMediaAttachmentCopy;
                     [self.collectionView reloadData];
                 }
                 else {
@@ -688,7 +707,7 @@
     if ([m.media isKindOfClass:[JSQPhotoMediaItem class]])
     {
         NSLog(@"Tapped photo bubble!");
-        JSQPhotoMediaItem* ms = (JSQPhotoMediaItem*)m.media;        
+//        JSQPhotoMediaItem* ms = (JSQPhotoMediaItem*)m.media;        
     }
     else if ([m.media isKindOfClass:[JSQLocationMediaItem class]])
     {
@@ -702,9 +721,9 @@
         NSLog(@"Tapped Video bubble!");
         
     }
-    else if ([m.media isKindOfClass:[JSQContactItem class]])
+    else if ([m.media isKindOfClass:[JSQContactMediaItem class]])
     {
-//        JSQContactItem* ms = (JSQContactItem*)m.media;
+//        JSQContacMediatItem* ms = (JSQContacMediatItem*)m.media;
         NSLog(@"Tapped Contact bubble!");
         
     }
@@ -726,7 +745,7 @@
 {
     if ([UIPasteboard generalPasteboard].image) {
         // If there's an image in the pasteboard, construct a media item with that image and `send` it.
-        JSQPhotoMediaItem *item = [[JSQPhotoMediaItem alloc] initWithImage:[UIPasteboard generalPasteboard].image];
+        JSQPhotoMediaItem *item = [[JSQPhotoMediaItem alloc] initWithImage:[UIPasteboard generalPasteboard].image withSavedDir:demoChatId];
         JSQMessage *message = [[JSQMessage alloc] initWithSenderId:self.senderId
                                                  senderDisplayName:self.senderDisplayName
                                                               date:[NSDate date]

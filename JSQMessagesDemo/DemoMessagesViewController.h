@@ -21,6 +21,7 @@
 #import "JSQMessages.h"
 
 #import "DemoModelData.h"
+#import "DemoModelMetaData.h"
 #import "NSUserDefaults+DemoSettings.h"
 
 
@@ -32,14 +33,13 @@
 
 @end
 
-
-
-
 @interface DemoMessagesViewController : JSQMessagesViewController <UIActionSheetDelegate, JSQMessagesComposerTextViewPasteDelegate>
 
 @property (weak, nonatomic) id<JSQDemoViewControllerDelegate> delegateModal;
 
 @property (strong, nonatomic) DemoModelData *demoData;
+
+@property (strong, nonatomic) DemoModelMetaData *demoMetaData;
 
 - (void)receiveMessagePressed:(UIBarButtonItem *)sender;
 

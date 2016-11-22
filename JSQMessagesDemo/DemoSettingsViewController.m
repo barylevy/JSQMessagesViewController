@@ -17,7 +17,7 @@
 //
 
 #import "DemoSettingsViewController.h"
-
+#import "DemoMessagesViewController+Storage.h"
 #import "NSUserDefaults+DemoSettings.h"
 
 
@@ -41,6 +41,8 @@
     self.outgoingAvatarsSwitch.on = [NSUserDefaults outgoingAvatarSetting];
     
     self.springySwitch.on = [NSUserDefaults springinessSetting];
+    
+    self.storageSwitch.on = [NSUserDefaults storageSetting];
 }
 
 - (IBAction)didTapSwitch:(UISwitch *)sender
@@ -67,6 +69,9 @@
     
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
-
+- (IBAction)didTapClearStorage:(UIButton *)sender
+{
+    [DemoMessagesViewController deleteStorageOfChat:demoChatId];
+}
 
 @end

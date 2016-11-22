@@ -22,7 +22,7 @@
 #import "JSQMessagesMediaViewBubbleImageMasker.h"
 
 #import "UIImage+JSQMessages.h"
-
+#import "JSQStorage.h"
 
 @interface JSQVideoMediaItem ()
 
@@ -42,6 +42,24 @@
         _fileURL = [fileURL copy];
         _isReadyToPlay = isReadyToPlay;
         _cachedVideoImageView = nil;
+    }
+    return self;
+}
+- (instancetype)initWithFileURL:(NSURL *)fileURL withSavedDir:(NSString*)dir isReadyToPlay:(BOOL)isReadyToPlay
+{
+    self = [super initWithMediaDir:dir];
+    if (self) {
+        _externalFileURL = [fileURL copy];
+        _isReadyToPlay = isReadyToPlay;
+        _cachedVideoImageView = nil;
+        
+        self.mediaPath = [NSString stringWithFormat:@"%@.%@", [JSQStorage createNameForMediaItem:dir], _externalFileURL.pathExtension];
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            
+            [JSQStorage saveExternalURL:_externalFileURL toMediaPath:self.mediaPath withChatId:dir];
+        });
+        
+        
     }
     return self;
 }
@@ -132,7 +150,11 @@
 {
     self = [super initWithCoder:aDecoder];
     if (self) {
-        _fileURL = [aDecoder decodeObjectForKey:NSStringFromSelector(@selector(fileURL))];
+        
+        NSString* path = [aDecoder decodeObjectForKey:NSStringFromSelector(@selector(externalFileURL))];
+        if( path!=nil)
+            _externalFileURL = [NSURL fileURLWithPath:path];
+        _fileURL = [aDecoder decodeObjectForKey:NSStringFromSelector(@selector(fileURL))];//BARY why we need _fileURL 
         _isReadyToPlay = [aDecoder decodeBoolForKey:NSStringFromSelector(@selector(isReadyToPlay))];
     }
     return self;
@@ -141,6 +163,7 @@
 - (void)encodeWithCoder:(NSCoder *)aCoder
 {
     [super encodeWithCoder:aCoder];
+    [aCoder encodeObject:self.externalFileURL forKey:NSStringFromSelector(@selector(externalFileURL))];
     [aCoder encodeObject:self.fileURL forKey:NSStringFromSelector(@selector(fileURL))];
     [aCoder encodeBool:self.isReadyToPlay forKey:NSStringFromSelector(@selector(isReadyToPlay))];
 }
@@ -155,4 +178,10 @@
     return copy;
 }
 
+#pragma mark - Storage
+
+-(void) deleteStorageMedia
+{
+    [JSQStorage deleteMediaFromDisk:self.mediaPath];
+}
 @end

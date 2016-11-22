@@ -20,7 +20,7 @@
 
 #import "JSQMessagesMediaPlaceholderView.h"
 #import "JSQMessagesMediaViewBubbleImageMasker.h"
-
+#import "JSQStorage.h"
 
 @interface JSQPhotoMediaItem ()
 
@@ -35,10 +35,22 @@
 
 - (instancetype)initWithImage:(UIImage *)image
 {
-    self = [super init];
+    return [self initWithImage:image withSavedDir:nil];
+}
+- (instancetype)initWithImage:(UIImage *)image withSavedDir:(NSString*)dir
+{
+    self = [super initWithMediaDir:dir];
     if (self) {
         _image = [image copy];
+        
         _cachedImageView = nil;
+        
+        self.mediaPath = [NSString stringWithFormat:@"%@.png", [JSQStorage createNameForMediaItem:dir]];
+        
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            [JSQStorage saveMediaToDisk:self.mediaPath withMediaData:UIImagePNGRepresentation(self.image)];
+        });
+        
     }
     return self;
 }
@@ -56,7 +68,16 @@
     _image = [image copy];
     _cachedImageView = nil;
 }
-
+- (void)setImage:(UIImage *)image witDir:(NSString*)dir
+{
+    _image = [image copy];
+    _cachedImageView = nil;
+    self.parentDir = dir;
+    
+    self.mediaPath = [NSString stringWithFormat:@"%@.png", [JSQStorage createNameForMediaItem:dir]];
+    [JSQStorage saveMediaToDisk:self.mediaPath withMediaData:UIImagePNGRepresentation(self.image)];
+    
+}
 - (void)setAppliesMediaViewMaskAsOutgoing:(BOOL)appliesMediaViewMaskAsOutgoing
 {
     [super setAppliesMediaViewMaskAsOutgoing:appliesMediaViewMaskAsOutgoing];
@@ -108,7 +129,13 @@
 {
     self = [super initWithCoder:aDecoder];
     if (self) {
-        _image = [aDecoder decodeObjectForKey:NSStringFromSelector(@selector(image))];
+        
+        NSData* imageData = [JSQStorage loadMediaFromDisk:self.mediaPath];
+        
+        if(imageData != nil)
+            self.image = [UIImage imageWithData:imageData];
+        else
+            self.image = [aDecoder decodeObjectForKey:NSStringFromSelector(@selector(image))];
     }
     return self;
 }
@@ -116,16 +143,22 @@
 - (void)encodeWithCoder:(NSCoder *)aCoder
 {
     [super encodeWithCoder:aCoder];
-    [aCoder encodeObject:self.image forKey:NSStringFromSelector(@selector(image))];
+    
+    if(self.parentDir==nil)
+        [aCoder encodeObject:self.image forKey:NSStringFromSelector(@selector(image))];
+    
 }
 
 #pragma mark - NSCopying
 
 - (instancetype)copyWithZone:(NSZone *)zone
 {
-    JSQPhotoMediaItem *copy = [[JSQPhotoMediaItem allocWithZone:zone] initWithImage:self.image];
+    JSQPhotoMediaItem *copy = [[JSQPhotoMediaItem allocWithZone:zone] initWithImage:self.image withSavedDir:self.parentDir];
     copy.appliesMediaViewMaskAsOutgoing = self.appliesMediaViewMaskAsOutgoing;
     return copy;
 }
-
+-(void) deleteStorageMedia
+{
+    [JSQStorage deleteMediaFromDisk:self.mediaPath];
+}
 @end

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="11542" systemVersion="16B2555" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11524"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view opaque="NO" contentMode="scaleToFill" placeholderIntrinsicWidth="600" placeholderIntrinsicHeight="50" id="iN0-l3-epB" customClass="JSQMessagesLocationView">
+            <rect key="frame" x="0.0" y="0.0" width="280" height="256"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <imageView opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="byB-Dy-6F6" userLabel="Location Image">
+                    <rect key="frame" x="15" y="15" width="245" height="196"/>
+                    <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+                </imageView>
+                <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="No Location Name" textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="BsI-lc-LIZ">
+                    <rect key="frame" x="15" y="219" width="245" height="31"/>
+                    <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="31" id="lgc-M1-b2w"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                    <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                </textView>
+            </subviews>
+            <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+            <accessibility key="accessibilityConfiguration" identifier="JSQMessagesContactView">
+                <bool key="isElement" value="YES"/>
+            </accessibility>
+            <constraints>
+                <constraint firstItem="byB-Dy-6F6" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="15" id="66W-Xr-kWR"/>
+                <constraint firstAttribute="bottom" secondItem="BsI-lc-LIZ" secondAttribute="bottom" constant="6" id="6N7-6U-zTn"/>
+                <constraint firstItem="byB-Dy-6F6" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="15" id="8zP-gb-gEw"/>
+                <constraint firstItem="byB-Dy-6F6" firstAttribute="leading" secondItem="BsI-lc-LIZ" secondAttribute="leading" id="RJa-0e-DJb"/>
+                <constraint firstItem="byB-Dy-6F6" firstAttribute="trailing" secondItem="BsI-lc-LIZ" secondAttribute="trailing" id="kQS-SR-hjQ"/>
+                <constraint firstItem="BsI-lc-LIZ" firstAttribute="top" secondItem="byB-Dy-6F6" secondAttribute="bottom" constant="8" symbolic="YES" id="od5-n9-gvb"/>
+                <constraint firstAttribute="trailing" secondItem="byB-Dy-6F6" secondAttribute="trailing" constant="20" id="zyc-Wc-1hW"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="locDesc" destination="BsI-lc-LIZ" id="5HU-TE-Sh7"/>
+                <outlet property="mapImage" destination="byB-Dy-6F6" id="Fq3-Va-b7X"/>
+            </connections>
+            <point key="canvasLocation" x="-482" y="-25"/>
+        </view>
+    </objects>
+</document>

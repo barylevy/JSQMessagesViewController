@@ -66,6 +66,28 @@
     return [[UIImageView alloc] initWithImage:self.avatarImage ?: self.avatarPlaceholderImage];
 }
 
+#pragma mark - NSCoding
+
+- (instancetype)initWithCoder:(NSCoder *)aDecoder
+{
+    self = [super init];
+    if (self) {
+        _avatarImage = [aDecoder decodeObjectForKey:NSStringFromSelector(@selector(avatarImage))];
+        _avatarHighlightedImage = [aDecoder decodeObjectForKey:NSStringFromSelector(@selector(avatarHighlightedImage))];
+        _avatarPlaceholderImage = [aDecoder decodeObjectForKey:NSStringFromSelector(@selector(avatarPlaceholderImage))];
+        
+    }
+    return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)aCoder
+{
+    [aCoder encodeObject:self.avatarImage forKey:NSStringFromSelector(@selector(avatarImage))];
+    [aCoder encodeObject:self.avatarHighlightedImage forKey:NSStringFromSelector(@selector(avatarHighlightedImage))];
+    [aCoder encodeObject:self.avatarPlaceholderImage forKey:NSStringFromSelector(@selector(avatarPlaceholderImage))];
+    
+}
+
 #pragma mark - NSCopying
 
 - (instancetype)copyWithZone:(NSZone *)zone

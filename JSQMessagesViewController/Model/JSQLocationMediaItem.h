@@ -24,6 +24,8 @@
  */
 typedef void (^JSQLocationMediaItemCompletionBlock)(void);
 
+#define JSQLocationMediaItem_LOCATION_DESCRIPTION    @"LOCATION_DESCRIPTION"
+#define JSQLocationMediaItem_LOCATION_NAME           @"LOCATION_NAME"
 
 #import "JSQMediaItem.h"
 
@@ -39,6 +41,11 @@ typedef void (^JSQLocationMediaItemCompletionBlock)(void);
  *  The location for the media item. The default value is `nil`.
  */
 @property (copy, nonatomic) CLLocation *location;
+
+/**
+ *  The coordinate of the location property.
+ */
+@property (retain, nonatomic) NSMutableDictionary* locationDetails;
 
 /**
  *  The coordinate of the location property.

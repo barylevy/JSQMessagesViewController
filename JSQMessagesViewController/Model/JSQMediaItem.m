@@ -37,13 +37,22 @@
 {
     return [self initWithMaskAsOutgoing:YES];
 }
-
+- (instancetype)initWithMediaDir:(NSString*)dir
+{
+    self = [self initWithMaskAsOutgoing:YES];
+    if (self) {
+        _parentDir = dir;
+        
+    }
+    return self;
+}
 - (instancetype)initWithMaskAsOutgoing:(BOOL)maskAsOutgoing
 {
     self = [super init];
     if (self) {
         _appliesMediaViewMaskAsOutgoing = maskAsOutgoing;
         _cachedPlaceholderView = nil;
+        _parentDir = @"./";
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(didReceiveMemoryWarningNotification:)
                                                      name:UIApplicationDidReceiveMemoryWarningNotification
@@ -150,6 +159,9 @@
     self = [super init];
     if (self) {
         _appliesMediaViewMaskAsOutgoing = [aDecoder decodeBoolForKey:NSStringFromSelector(@selector(appliesMediaViewMaskAsOutgoing))];
+        _mediaPath = [aDecoder decodeObjectForKey:NSStringFromSelector(@selector(mediaPath))];
+        _parentDir = [aDecoder decodeObjectForKey:NSStringFromSelector(@selector(parentDir))];
+        
     }
     return self;
 }
@@ -157,6 +169,8 @@
 - (void)encodeWithCoder:(NSCoder *)aCoder
 {
     [aCoder encodeBool:self.appliesMediaViewMaskAsOutgoing forKey:NSStringFromSelector(@selector(appliesMediaViewMaskAsOutgoing))];
+    [aCoder encodeObject:self.mediaPath forKey:NSStringFromSelector(@selector(mediaPath))];
+    [aCoder encodeObject:self.parentDir forKey:NSStringFromSelector(@selector(parentDir))];
 }
 
 #pragma mark - NSCopying
@@ -165,5 +179,8 @@
 {
     return [[[self class] allocWithZone:zone] initWithMaskAsOutgoing:self.appliesMediaViewMaskAsOutgoing];
 }
-
+-(void) deleteStorageMedia
+{
+    
+}
 @end

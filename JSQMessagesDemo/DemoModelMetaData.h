@@ -2,7 +2,6 @@
 //  Created by Bary Levy (2016).
 //  barylevy@gmail.com
 //
-//
 //  Documentation
 //  http://cocoadocs.org/docsets/JSQMessagesViewController
 //
@@ -12,19 +11,20 @@
 //
 //
 //  License
-//  Copyright (c) 2016 Jesse Squires
+//  Copyright (c) 2014 Jesse Squires
 //  Released under an MIT license: http://opensource.org/licenses/MIT
 //
 
+#import <Foundation/Foundation.h>
 
-#import <UIKit/UIKit.h>
+@interface DemoModelMetaData : NSObject  <NSCoding>
 
-IB_DESIGNABLE
+@property (strong, nonatomic) NSString *lastMessage;
 
-@interface JSQMessagesContactView : UIView
+@property (strong, nonatomic) NSString *title;
 
-@property (weak, nonatomic) IBOutlet UIImageView *contactImage;
+@property (strong, nonatomic) NSDate *lastUpdate;
 
-@property (weak, nonatomic) IBOutlet UITextView *mainText;
+-(void)updateLastMessage:(NSString*)message;
 
 @end
